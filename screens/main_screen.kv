@@ -1,0 +1,200 @@
+<MainScreen>:
+    # ==========================================
+    # 1. MAIN APP CONTENT (Behind Splash Screen)
+    # ==========================================
+    MDNavigationLayout:
+        
+        ScreenManager:
+            MDScreen:
+                MDBoxLayout:
+                    orientation: 'vertical'
+
+                    # Custom Premium Gradient Header
+                    MDBoxLayout:
+                        id: top_bar_container
+                        orientation: 'horizontal'
+                        size_hint_y: None
+                        height: "56dp"
+                        padding: ["8dp", 0, "8dp", 0]
+                        spacing: "8dp" 
+
+                        # Left Icon (Menu or Back)
+                        MDIconButton:
+                            id: left_icon_btn
+                            icon: "menu"
+                            theme_text_color: "Custom"
+                            text_color: 1, 1, 1, 1
+                            pos_hint: {"center_y": .5}
+                            on_release: root.open_menu_or_go_back()
+
+                        # APP LOGO 
+                        Image:
+                            source: "assets/logo.png" 
+                            size_hint: None, None
+                            size: "36dp", "36dp" 
+                            pos_hint: {"center_y": .5}
+                            allow_stretch: True
+                            keep_ratio: True
+
+                        # Title
+                        MDLabel:
+                            id: top_bar_title
+                            text: "AI Prompt Gallery"
+                            theme_text_color: "Custom"
+                            text_color: 1, 1, 1, 1
+                            font_style: "H6"
+                            bold: True
+                            halign: "left"
+                            valign: "center"
+
+                        # Right Icon (Home)
+                        MDIconButton:
+                            id: right_icon_btn
+                            icon: "home"
+                            theme_text_color: "Custom"
+                            text_color: 1, 1, 1, 1
+                            pos_hint: {"center_y": .5}
+                            opacity: 0 
+                            disabled: True
+                            on_release: root.filter_and_switch("All")
+
+                    # Footer Navigation
+                    MDBottomNavigation:
+                        id: bottom_nav 
+                        panel_color: app.theme_cls.bg_dark
+                        text_color_active: app.theme_cls.primary_color
+
+                        # Tab 1: Gallery (Home)
+                        MDBottomNavigationItem:
+                            name: 'screen_gallery'
+                            text: 'Gallery'
+                            icon: 'view-grid'
+
+                            ScrollView:
+                                do_scroll_x: False
+                                MDBoxLayout:
+                                    orientation: 'vertical'
+                                    adaptive_height: True
+                                    
+                                    MDGridLayout:
+                                        id: gallery_grid
+                                        cols: 2
+                                        adaptive_height: True
+                                        row_default_height: "220dp"
+                                        row_force_default: True
+                                        padding: "12dp"
+                                        spacing: "12dp"
+                                        size_hint_x: 1 
+                                        
+                        # Tab 2: Categories
+                        MDBottomNavigationItem:
+                            name: 'screen_categories'
+                            text: 'Categories'
+                            icon: 'shape'
+
+                            ScrollView:
+                                do_scroll_x: False
+                                MDBoxLayout:
+                                    id: category_list
+                                    orientation: 'vertical'
+                                    adaptive_height: True
+                                    padding: "16dp"
+                                    spacing: "16dp"
+                                    
+                        # Tab 3: Prompt List
+                        MDBottomNavigationItem:
+                            name: 'screen_list'
+                            text: 'List View'
+                            icon: 'format-list-bulleted'
+
+                            ScrollView:
+                                do_scroll_x: False
+                                MDBoxLayout:
+                                    id: prompt_list
+                                    orientation: 'vertical'
+                                    adaptive_height: True
+                                    padding: "16dp"
+                                    spacing: "16dp"
+
+        # Sidebar Menu
+        MDNavigationDrawer:
+            id: nav_drawer
+            radius: (0, 16, 16, 0)
+            md_bg_color: app.theme_cls.bg_dark
+            
+            MDNavigationDrawerMenu:
+                MDNavigationDrawerHeader:
+                    title: "Md Arman"
+                    text: "Visual Content Designer"
+                    title_color: 1, 1, 1, 1
+                    text_color: 0.7, 0.7, 0.7, 1
+                    spacing: "4dp"
+                    padding: "12dp", 0, 0, "56dp"
+
+                MDNavigationDrawerItem:
+                    icon: "information"
+                    text: "About Us"
+                    text_color: 1, 1, 1, 1
+                    icon_color: 1, 1, 1, 1
+                    on_release: root.show_about_us()
+
+                MDNavigationDrawerItem:
+                    icon: "email"
+                    text: "Contact Us"
+                    text_color: 1, 1, 1, 1
+                    icon_color: 1, 1, 1, 1
+                    on_release: root.show_contact_us()
+                    
+                MDNavigationDrawerItem:
+                    icon: "shield-check"
+                    text: "Privacy Policy"
+                    text_color: 1, 1, 1, 1
+                    icon_color: 1, 1, 1, 1
+                    on_release: root.show_privacy_policy()
+
+                MDNavigationDrawerItem:
+                    icon: "file-document"
+                    text: "Terms & Conditions"
+                    text_color: 1, 1, 1, 1
+                    icon_color: 1, 1, 1, 1
+                    on_release: root.show_terms()
+
+    # ==========================================
+    # 2. SPLASH SCREEN OVERLAY (On Top)
+    # ==========================================
+    MDFloatLayout:
+        id: splash_layout
+        md_bg_color: 0.05, 0.05, 0.08, 1 # Premium Dark Background
+        opacity: 1
+
+        Image:
+            source: "assets/logo.png"
+            size_hint: None, None
+            size: "140dp", "140dp"
+            pos_hint: {"center_x": .5, "center_y": .55}
+            allow_stretch: True
+            keep_ratio: True
+
+        MDLabel:
+            text: "AI Prompt Gallery"
+            theme_text_color: "Custom"
+            text_color: 1, 1, 1, 1
+            font_style: "H5"
+            bold: True
+            halign: "center"
+            pos_hint: {"center_x": .5, "center_y": .4}
+            
+        MDLabel:
+            text: "By Md Arman"
+            theme_text_color: "Custom"
+            text_color: 0.6, 0.6, 0.6, 1
+            font_style: "Caption"
+            halign: "center"
+            pos_hint: {"center_x": .5, "center_y": .36}
+
+        MDSpinner:
+            size_hint: None, None
+            size: "36dp", "36dp"
+            pos_hint: {"center_x": .5, "center_y": .2}
+            active: True
+            color: app.theme_cls.primary_color
