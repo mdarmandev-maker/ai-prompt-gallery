@@ -21,12 +21,17 @@ jobs:
       - name: 3. Zaroori Linux Tools Install karna
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential git libtool pkg-config autoconf automake zip unzip openjdk-17-jdk libffi-dev libssl-dev
+          sudo apt-get install -y build-essential git libtool pkg-config autoconf automake zip unzip openjdk-17-jdk libffi-dev libssl-dev cmake curl
           pip install --upgrade pip
           pip install buildozer virtualenv "Cython<3.0"
 
-      - name: 4. APK Banana (License Accept ke sath)
+      - name: 4. Buildozer Android Build
         run: |
+          # Android SDK/NDK paths ko manually clean karna taaki clash na ho
+          export ANDROID_HOME=/usr/local/lib/android/sdk
+          export ANDROID_NDK_HOME=/usr/local/lib/android/sdk/ndk/25.2.9519653
+          
+          # Build shuru karna
           yes | buildozer -v android debug
 
       - name: 5. APK ko Save karna
