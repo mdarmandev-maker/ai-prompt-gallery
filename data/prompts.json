@@ -1,65 +1,65 @@
 [
-  {
-    "id": 1,
-    "title": "Elegant Portrait",
-    "prompt": "Portrait of a confident woman in a white turtleneck, studio lighting, professional photography, 85mm lens, 8k resolution.",
-    "category": "Portrait",
-    "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    "id": 2,
-    "title": "Vintage Watch",
-    "prompt": "Macro photography of a luxury vintage watch, gold and black, dramatic lighting, product design, clean reflections.",
-    "category": "Product",
-    "image": "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    "id": 3,
-    "title": "Neon Sports Car",
-    "prompt": "Sleek modern sports car speeding down a neon-lit city street at night, cinematic motion blur, octane render.",
-    "category": "Vehicles",
-    "image": "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    "id": 4,
-    "title": "Floating Island",
-    "prompt": "Surreal photo manipulation of a giant glowing island floating above the clouds, fantasy art style, highly detailed.",
-    "category": "Manipulation",
-    "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    "id": 5,
-    "title": "Cyberpunk Street",
-    "prompt": "Trending futuristic cyberpunk street scene, neon signs reflecting in rain puddles, 3D render, octane render.",
-    "category": "Trending",
-    "image": "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    "id": 6,
-    "title": "Vaporwave Aesthetic",
-    "prompt": "Pastel color palette of pinks, teals, and purples, retro computer graphics, greek statues, synthwave style, highly detailed.",
-    "category": "Vaporwave",
-    "image": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    "id": 7,
-    "title": "Brutalist Web Design",
-    "prompt": "Stark layout, monochrome color palette, heavy use of concrete textures, strong blocky typography, grid-based layout.",
-    "category": "Neo-Brutalism",
-    "image": "https://images.unsplash.com/photo-1517650862521-d580d5348145?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    "id": 8,
-    "title": "Cinematic Sci-Fi",
-    "prompt": "A lone figure looking at a massive glowing structure in a futuristic city, cinematic lighting, dramatic shadows, wide angle lens, 8k.",
-    "category": "Cinematic",
-    "image": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    "id": 9,
-    "title": "Hyper-Realistic Food",
-    "prompt": "Macro shot of a gourmet burger, melted cheese, dripping sauce, steam rising, perfect studio lighting, incredibly detailed.",
-    "category": "Photorealistic",
-    "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80"
-  }
+    {
+        "id": 1,
+        "title": "Elegant Portrait",
+        "prompt": "Portrait of a confident woman in a white turtleneck, studio lighting, professional photography, 85mm lens, 8k resolution.",
+        "category": "Portrait",
+        "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        "id": 2,
+        "title": "Vintage Watch",
+        "prompt": "Macro photography of a luxury vintage watch, gold and black, dramatic lighting, product design, clean reflections.",
+        "category": "Product",
+        "image": "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        "id": 3,
+        "title": "Neon Sports Car",
+        "prompt": "Sleek modern sports car speeding down a neon-lit city street at night, cinematic motion blur, octane render.",
+        "category": "Vehicles",
+        "image": "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        "id": 4,
+        "title": "Floating Island",
+        "prompt": "Surreal photo manipulation of a giant glowing island floating above the clouds, fantasy art style, highly detailed.",
+        "category": "Manipulation",
+        "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        "id": 5,
+        "title": "Cyberpunk Street",
+        "prompt": "Trending futuristic cyberpunk street scene, neon signs reflecting in rain puddles, 3D render, octane render.",
+        "category": "Trending",
+        "image": "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        "id": 6,
+        "title": "Vaporwave Aesthetic",
+        "prompt": "Pastel color palette of pinks, teals, and purples, retro computer graphics, greek statues, synthwave style, highly detailed.",
+        "category": "Vaporwave",
+        "image": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        "id": 7,
+        "title": "Brutalist Web Design",
+        "prompt": "Stark layout, monochrome color palette, heavy use of concrete textures, strong blocky typography, grid-based layout.",
+        "category": "Neo-Brutalism",
+        "image": "https://images.unsplash.com/photo-1517650862521-d580d5348145?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        "id": 8,
+        "title": "Cinematic Sci-Fi",
+        "prompt": "A lone figure looking at a massive glowing structure in a futuristic city, cinematic lighting, dramatic shadows, wide angle lens, 8k.",
+        "category": "Cinematic",
+        "image": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        "id": 9,
+        "title": "Hyper-Realistic Food",
+        "prompt": "Macro shot of a gourmet burger, melted cheese, dripping sauce, steam rising, perfect studio lighting, incredibly detailed.",
+        "category": "Photorealistic",
+        "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80"
+    }
 ]
