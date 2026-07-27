@@ -5,7 +5,7 @@ on:
       - main
 jobs:
   build-android:
-    runs-on: ubuntu-22.04   # <-- YAHI LINE BADLI HAI (pehle ubuntu-latest thi)
+    runs-on: ubuntu-22.04
     steps:
       - name: 1. Code Download karna
         uses: actions/checkout@v4
@@ -21,16 +21,12 @@ jobs:
           pip install buildozer virtualenv "Cython<3.0"
       - name: 4. Buildozer Android Build
         run: |
-          # Android SDK/NDK paths ko manually clean karna taaki clash na ho
-          export ANDROID_HOME=/usr/local/lib/android/sdk
-          export ANDROID_NDK_HOME=/usr/local/lib/android/sdk/ndk/25.2.9519653
-
-          # NOTE: 'yes |' hata diya - buildozer.spec mein pehle se hi
-          # android.accept_sdk_license = True set hai, isliye license
-          # wapas se manually accept karwana zaroori nahi tha, aur wahi
-          # pipe tumhare log ke bilkul end mein "Broken pipe" wali
-          # (harmless lekin confusing) warning de raha tha.
-          buildozer -v android debug
+          # NOTE: 'yes |' WAPAS ADD KIYA - ye zaroori hai taaki jab
+          # buildozer pehli baar Android SDK Build-Tools / licenses
+          # download kare, to har "Accept? (y/N)" prompt ko automatic
+          # "y" mil jaye. Isko hata dene se hi pichhli baar
+          # "Aidl not found" wala error aaya tha.
+          yes | buildozer -v android debug
       - name: 5. APK ko Save karna
         uses: actions/upload-artifact@v4
         with:
