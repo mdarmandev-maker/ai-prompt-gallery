@@ -1,39 +1,36 @@
 name: BuilAndroidAPK
-
 on:
   push:
     branches:
       - main
-
 jobs:
   build-android:
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-22.04   # <-- YAHI LINE BADLI HAI (pehle ubuntu-latest thi)
     steps:
       - name: 1. Code Download karna
         uses: actions/checkout@v4
-
       - name: 2. Python Setup karna
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
       - name: 3. Zaroori Linux Tools Install karna
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential git libtool pkg-config autoconf automake zip unzip openjdk-17-jdk libffi-dev libssl-dev cmake curl
           pip install --upgrade pip
           pip install buildozer virtualenv "Cython<3.0"
-
       - name: 4. Buildozer Android Build
         run: |
           # Android SDK/NDK paths ko manually clean karna taaki clash na ho
           export ANDROID_HOME=/usr/local/lib/android/sdk
           export ANDROID_NDK_HOME=/usr/local/lib/android/sdk/ndk/25.2.9519653
-          
-          # Build shuru karna
-          yes | buildozer -v android debug
 
+          # NOTE: 'yes |' hata diya - buildozer.spec mein pehle se hi
+          # android.accept_sdk_license = True set hai, isliye license
+          # wapas se manually accept karwana zaroori nahi tha, aur wahi
+          # pipe tumhare log ke bilkul end mein "Broken pipe" wali
+          # (harmless lekin confusing) warning de raha tha.
+          buildozer -v android debug
       - name: 5. APK ko Save karna
         uses: actions/upload-artifact@v4
         with:
