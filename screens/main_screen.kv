@@ -6,63 +6,100 @@
         
         ScreenManager:
             MDScreen:
+                # App ka Background Dark/Gradient jaisa rakhna taaki glass chamke
+                md_bg_color: 0.05, 0.05, 0.07, 1 
+
+                # Ambient animated "aurora" gradient - poore screen ke peeche,
+                # sab se pehle add kiya hai isliye baaki sab iske upar draw hota hai
+                AmbientGradientBG:
+                    size_hint: 1, 1
+
                 MDBoxLayout:
                     orientation: 'vertical'
 
-                    # Custom Premium Gradient Header
-                    MDBoxLayout:
-                        id: top_bar_container
-                        orientation: 'horizontal'
+                    # Custom Premium Header (Bulletproof Background Image Layering)
+                    MDFloatLayout:
                         size_hint_y: None
-                        height: "56dp"
-                        padding: ["8dp", 0, "8dp", 0]
-                        spacing: "8dp" 
+                        height: "64dp" 
+                        
+                        # BACKGROUND LAYER
+                        # LAYER 1: Sabse peeche aapki background image
+                        FitImage:
+                            source: "assets/header_bg.jpg" 
+                            size_hint: 1, 1
+                            pos_hint: {"center_x": .5, "center_y": .5}
 
-                        # Left Icon (Menu or Back)
-                        MDIconButton:
-                            id: left_icon_btn
-                            icon: "menu"
-                            theme_text_color: "Custom"
-                            text_color: 1, 1, 1, 1
-                            pos_hint: {"center_y": .5}
-                            on_release: root.open_menu_or_go_back()
+                        # LAYER 2: Uske upar aapke buttons, logo aur text
+                        MDBoxLayout:
+                            orientation: 'horizontal'
+                            size_hint: 1, 1
+                            pos_hint: {"center_x": .5, "center_y": .5}
+                            padding: ["12dp", "8dp", "12dp", "8dp"]
+                            spacing: "12dp"
 
-                        # APP LOGO 
-                        Image:
-                            source: "assets/logo.png" 
-                            size_hint: None, None
-                            size: "36dp", "36dp" 
-                            pos_hint: {"center_y": .5}
-                            allow_stretch: True
-                            keep_ratio: True
+                            # Left Icon (Menu or Back)
+                            MDIconButton:
+                                id: left_icon_btn
+                                icon: "menu"
+                                theme_text_color: "Custom"
+                                text_color: 1, 1, 1, 1
+                                pos_hint: {"center_y": .5}
+                                on_release: root.open_menu_or_go_back()
 
-                        # Title
-                        MDLabel:
-                            id: top_bar_title
-                            text: "AI Prompt Gallery"
-                            theme_text_color: "Custom"
-                            text_color: 1, 1, 1, 1
-                            font_style: "H6"
-                            bold: True
-                            halign: "left"
-                            valign: "center"
+                            # APP LOGO 
+                            Image:
+                                source: "assets/logo.png" 
+                                size_hint: None, None
+                                size: "40dp", "40dp" 
+                                pos_hint: {"center_y": .5}
 
-                        # Right Icon (Home)
-                        MDIconButton:
-                            id: right_icon_btn
-                            icon: "home"
-                            theme_text_color: "Custom"
-                            text_color: 1, 1, 1, 1
-                            pos_hint: {"center_y": .5}
-                            opacity: 0 
-                            disabled: True
-                            on_release: root.filter_and_switch("All")
+                            # Title
+                            # --- TITLE WITH PREMIUM FADE SHADOW ---
+                            MDRelativeLayout:
+                                size_hint_x: 1 # Baaki bachi hui saari jagah cover karega
 
-                    # Footer Navigation
+                                # 1. FADE SHADOW LAYER (Peeche wala text)
+                                MDLabel:
+                                    text: "AI Prompt Gallery"
+                                    theme_text_color: "Custom"
+                                    text_color: 0, 0, 0.2, 0.5 # 50% Transparent Black (Soft Fade)
+                                    font_style: "H5"
+                                    bold: True
+                                    halign: "left"
+                                    valign: "center"
+                                    pos: "3dp", "-3dp" # Thoda right aur niche shift kiya shadow ke liye
+                                    font_name: "assets/orbitron-bold.otf" 
+
+                                # 2. MAIN TEXT LAYER (Upar wala safed text)
+                                MDLabel:
+                                    id: top_bar_title
+                                    text: "AI Prompt Gallery"
+                                    theme_text_color: "Custom"
+                                    text_color: 1, 1, 1, 1 
+                                    font_style: "H5"
+                                    bold: True
+                                    halign: "left"
+                                    valign: "center"
+                                    font_name: "assets/orbitron-bold.otf"
+
+                            # Right Icon (Home)
+                            MDIconButton:
+                                id: right_icon_btn
+                                icon: "home"
+                                theme_text_color: "Custom"
+                                text_color: 1, 1, 1, 1
+                                pos_hint: {"center_y": .5}
+                                opacity: 0 
+                                disabled: True
+                                on_release: root.filter_and_switch("All")
+
+                    # Footer Navigation - GLASSMORPHISM EFFECT
                     MDBottomNavigation:
                         id: bottom_nav 
-                        panel_color: app.theme_cls.bg_dark
+                        panel_color: 0.1, 0.1, 0.12, 0.85
                         text_color_active: app.theme_cls.primary_color
+                        text_color_normal: 0.5, 0.5, 0.5, 1
+                        use_text: True 
 
                         # Tab 1: Gallery (Home)
                         MDBottomNavigationItem:
@@ -80,10 +117,10 @@
                                         id: gallery_grid
                                         cols: 2
                                         adaptive_height: True
-                                        row_default_height: "220dp"
+                                        row_default_height: "240dp"
                                         row_force_default: True
-                                        padding: "12dp"
-                                        spacing: "12dp"
+                                        padding: "16dp"
+                                        spacing: "16dp"
                                         size_hint_x: 1 
                                         
                         # Tab 2: Categories
@@ -116,11 +153,32 @@
                                     padding: "16dp"
                                     spacing: "16dp"
 
-        # Sidebar Menu
+                # "Surprise Me" - ek random prompt seedha khol deta hai.
+                # Content ke upar float karta hai, bottom tab-bar se thoda upar.
+                # Peeche ek breathing glow-ring hai jo FAB ki taraf dhyaan
+                # kheenchta hai (infinite loop - MainScreen.fab_glow_alpha).
+                MDFloatLayout:
+                    size_hint: None, None
+                    size: "72dp", "72dp"
+                    pos_hint: {"right": 0.97, "y": 0.115}
+                    canvas.before:
+                        Color:
+                            rgba: app.theme_cls.primary_color[0], app.theme_cls.primary_color[1], app.theme_cls.primary_color[2], root.fab_glow_alpha
+                        Ellipse:
+                            pos: self.pos
+                            size: self.size
+
+                    MDFloatingActionButton:
+                        icon: "shuffle-variant"
+                        md_bg_color: app.theme_cls.primary_color
+                        pos_hint: {"center_x": .5, "center_y": .5}
+                        on_release: root.show_random_prompt()
+
+        # Sidebar Menu - GLASSMORPHISM EFFECT
         MDNavigationDrawer:
             id: nav_drawer
-            radius: (0, 16, 16, 0)
-            md_bg_color: app.theme_cls.bg_dark
+            radius: (0, 24, 24, 0) 
+            md_bg_color: 0.08, 0.08, 0.1, 0.9 
             
             MDNavigationDrawerMenu:
                 MDNavigationDrawerHeader:
@@ -128,8 +186,8 @@
                     text: "Visual Content Designer"
                     title_color: 1, 1, 1, 1
                     text_color: 0.7, 0.7, 0.7, 1
-                    spacing: "4dp"
-                    padding: "12dp", 0, 0, "56dp"
+                    spacing: "8dp"
+                    padding: "16dp", 0, 0, "48dp"
 
                 MDNavigationDrawerItem:
                     icon: "information"
@@ -164,13 +222,14 @@
     # ==========================================
     MDFloatLayout:
         id: splash_layout
-        md_bg_color: 0.05, 0.05, 0.08, 1 # Premium Dark Background
+        md_bg_color: 0.03, 0.03, 0.05, 1 
         opacity: 1
 
         Image:
+            id: splash_logo
             source: "assets/logo.png"
             size_hint: None, None
-            size: "140dp", "140dp"
+            size: "40dp", "40dp"
             pos_hint: {"center_x": .5, "center_y": .55}
             allow_stretch: True
             keep_ratio: True
@@ -187,14 +246,14 @@
         MDLabel:
             text: "By Md Arman"
             theme_text_color: "Custom"
-            text_color: 0.6, 0.6, 0.6, 1
+            text_color: 0.5, 0.5, 0.5, 1
             font_style: "Caption"
             halign: "center"
-            pos_hint: {"center_x": .5, "center_y": .36}
+            pos_hint: {"center_x": .5, "center_y": .35}
 
         MDSpinner:
             size_hint: None, None
-            size: "36dp", "36dp"
+            size: "40dp", "40dp"
             pos_hint: {"center_x": .5, "center_y": .2}
             active: True
             color: app.theme_cls.primary_color
