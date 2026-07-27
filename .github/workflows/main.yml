@@ -9,24 +9,45 @@ jobs:
     steps:
       - name: 1. Code Download karna
         uses: actions/checkout@v4
+
       - name: 2. Python Setup karna
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+
+      - name: 2b. Runner ki Extra Disk Space Free karna
+        # GitHub ke free runner mein sirf ~14GB free space hota hai.
+        # 2 architectures + Android NDK + saari compiled libraries
+        # isse zyada le sakti hain, jisse build beech mein
+        # "No space left on device" ke saath fail ho jaata hai
+        # (bina koi clear error message dikhaye - bas atak jaata hai).
+        # Yahan .NET, Haskell, CodeQL jaise pehle se installed lekin
+        # is build ke liye bekaar tools hata ke ~25-30GB extra space
+        # free kar rahe hain.
+        run: |
+          echo "Before cleanup:"
+          df -h /
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android/sdk/ndk  # hum apna khud ka NDK use karenge (buildozer)
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          sudo docker image prune --all --force || true
+          echo "After cleanup:"
+          df -h /
+
       - name: 3. Zaroori Linux Tools Install karna
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential git libtool pkg-config autoconf automake zip unzip openjdk-17-jdk libffi-dev libssl-dev cmake curl
           pip install --upgrade pip
           pip install buildozer virtualenv "Cython<3.0"
+
       - name: 4. Buildozer Android Build
         run: |
-          # NOTE: 'yes |' WAPAS ADD KIYA - ye zaroori hai taaki jab
-          # buildozer pehli baar Android SDK Build-Tools / licenses
-          # download kare, to har "Accept? (y/N)" prompt ko automatic
-          # "y" mil jaye. Isko hata dene se hi pichhli baar
-          # "Aidl not found" wala error aaya tha.
           yes | buildozer -v android debug
+
       - name: 5. APK ko Save karna
         uses: actions/upload-artifact@v4
         with:
