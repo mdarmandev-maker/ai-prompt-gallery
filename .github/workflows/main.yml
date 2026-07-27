@@ -38,6 +38,14 @@ jobs:
 
       - name: 4. Buildozer Android Build
         run: |
+          # FIX: Runner ka default JAVA_HOME Java 11 par point karta hai,
+          # lekin Android Gradle Plugin ko Java 17 chahiye. GitHub runner
+          # mein Java 17 pehle se installed hai (JAVA_HOME_17_X64 var
+          # mein) - usi ko explicitly use karte hain.
+          export JAVA_HOME=$JAVA_HOME_17_X64
+          export PATH=$JAVA_HOME/bin:$PATH
+          java -version
+
           yes | buildozer -v android debug
 
       # NAYA STEP: chahe build 4 pass ho ya fail, ye step hamesha
