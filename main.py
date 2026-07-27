@@ -1,7 +1,6 @@
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager, FadeTransition
 from screens.main_screen import MainScreen
-from kivy.core.window import Window
 
 # Set the window size to simulate a mobile phone (e.g., iPhone/Pixel aspect ratio)
 #Window.size = (360, 740)
@@ -21,4 +20,3 @@ class AIPromptGalleryApp(MDApp):
 
 if __name__ == '__main__':
     AIPromptGalleryApp().run()
-    
