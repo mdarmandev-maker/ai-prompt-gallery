@@ -25,7 +25,12 @@ version = 0.1
 author = Md Arman
 
 # (list) Application requirements
-requirements = python3,kivy,kivymd,pillow,requests,openssl,certifi,chardet,idna,urllib3,pyjnius
+# NOTE: pyjnius YAHAN JAAN-BOOJH KAR NAHI likha - wo Kivy ke Android
+# build mein already automatically shamil hota hai (Kivy ka apna core
+# dependency hai). Explicitly list karne se buildozer ek buggy pip-wheel
+# install path try karta hai jo fail ho jaata hai
+# ("Could not find a version that satisfies pyjnius==1.7.0").
+requirements = python3,kivy,kivymd,pillow,requests,openssl,certifi,chardet,idna,urllib3
 
 # (str) Supported orientation (portrait/landscape/all)
 orientation = portrait
