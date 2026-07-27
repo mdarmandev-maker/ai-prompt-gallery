@@ -1,4 +1,3 @@
-
 from kivy.lang import Builder
 from kivymd.uix.screen import MDScreen
 from widgets.prompt_card import PromptCard
@@ -8,23 +7,112 @@ from kivy.clock import Clock
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.list import OneLineListItem
-from kivy.graphics.texture import Texture
-from kivy.graphics import Rectangle, Color
-from kivy.animation import Animation  # Splash Screen animation ke liye
+from kivy.animation import Animation  
+from kivy.properties import ListProperty, NumericProperty
+from kivy.uix.widget import Widget
+from kivy.metrics import dp
+from collections import Counter
+import random
 import webbrowser
 
+Builder.load_string('''
+<AmbientGradientBG>:
+    canvas:
+        # Blob 1 - bottom-left
+        Color:
+            rgba: root.blob1_color
+        Ellipse:
+            pos: (self.width * 0.10 - self.width * 0.45, self.height * 0.85 - self.width * 0.45)
+            size: (self.width * 0.9, self.width * 0.9)
+        # Blob 2 - top-right
+        Color:
+            rgba: root.blob2_color
+        Ellipse:
+            pos: (self.width * 0.85 - self.width * 0.40, self.height * 0.70 - self.width * 0.40)
+            size: (self.width * 0.8, self.width * 0.8)
+        # Blob 3 - upper-center
+        Color:
+            rgba: root.blob3_color
+        Ellipse:
+            pos: (self.width * 0.50 - self.width * 0.35, self.height * 0.10 - self.width * 0.35)
+            size: (self.width * 0.7, self.width * 0.7)
+''')
+
 Builder.load_file('screens/main_screen.kv')
+
+
+class AmbientGradientBG(Widget):
+    """
+    Poore screen ke peeche ek slow, colorful "aurora" jaisa ambient
+    gradient background - 3 soft glowing blobs jo dheere-dheere apna
+    color cycle karte hain, ek dusre se thoda out-of-phase (alag delay
+    par shuru hote hain) taaki organic/"living" feel aaye - jaisa
+    Notion AI / ChatGPT / Linear jaise premium AI apps mein background
+    hota hai. Sirf decorative hai - touches ko intercept nahi karta.
+    """
+    blob1_color = ListProperty([0.45, 0.25, 0.85, 0.14])
+    blob2_color = ListProperty([0.15, 0.45, 0.85, 0.12])
+    blob3_color = ListProperty([0.85, 0.25, 0.55, 0.10])
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        Clock.schedule_once(self._start_all_cycles, 0)
+
+    def _start_all_cycles(self, *args):
+        stops = {
+            "blob1_color": ([0.45, 0.25, 0.85, 0.14], [0.15, 0.45, 0.85, 0.12], [0.85, 0.25, 0.55, 0.10]),
+            "blob2_color": ([0.15, 0.45, 0.85, 0.12], [0.85, 0.25, 0.55, 0.10], [0.45, 0.25, 0.85, 0.14]),
+            "blob3_color": ([0.85, 0.25, 0.55, 0.10], [0.45, 0.25, 0.85, 0.14], [0.15, 0.45, 0.85, 0.12]),
+        }
+        durations = {"blob1_color": 5.0, "blob2_color": 6.0, "blob3_color": 7.0}
+        delays = {"blob1_color": 0.0, "blob2_color": 1.2, "blob3_color": 2.4}
+
+        for prop_name, (c1, c2, c3) in stops.items():
+            Clock.schedule_once(
+                self._make_starter(prop_name, c1, c2, c3, durations[prop_name]),
+                delays[prop_name],
+            )
+
+    def _make_starter(self, prop_name, c1, c2, c3, duration):
+        def start(*_args):
+            anim = Animation(**{prop_name: c2}, duration=duration, t="in_out_sine")
+            anim += Animation(**{prop_name: c3}, duration=duration, t="in_out_sine")
+            anim += Animation(**{prop_name: c1}, duration=duration, t="in_out_sine")
+            anim.repeat = True
+            anim.start(self)
+        return start
 
 class MainScreen(MDScreen):
     dialog = None
     current_filter = "All"
     card_loading_event = None
-    gradient_rect = None 
+    # "Surprise Me" FAB ke peeche breathing glow-ring ke liye - infinite
+    # loop, isliye MainScreen par hi rakha hai (widget kabhi remove nahi
+    # hota, isliye animation hamesha safe rehta hai, koi leak nahi).
+    fab_glow_alpha = NumericProperty(0.20)
 
     def on_enter(self):
-        self.apply_gradient()
+        # FAB ka glow-loop turant shuru - ye hamesha chalta rehta hai
+        Clock.schedule_once(self._start_fab_glow_loop, 0)
+        # Splash logo ka premium "pop-in" entrance
+        Clock.schedule_once(self._animate_splash_logo, 0)
         # Data turant load karne ke bajaye, Splash screen ka timer start karo (2.5 seconds)
         Clock.schedule_once(self.start_splash_transition, 2.5)
+
+    def _start_fab_glow_loop(self, *args):
+        anim = (
+            Animation(fab_glow_alpha=0.55, duration=1.2, t="in_out_sine")
+            + Animation(fab_glow_alpha=0.18, duration=1.2, t="in_out_sine")
+        )
+        anim.repeat = True
+        anim.start(self)
+
+    def _animate_splash_logo(self, dt):
+        logo = self.ids.get("splash_logo")
+        if logo:
+            Animation(
+                size=(dp(160), dp(160)), duration=0.6, t="out_back"
+            ).start(logo)
 
     def start_splash_transition(self, dt):
         # Splash screen ko smoothly fade out karne ka code (0.6 seconds me gayab)
@@ -38,24 +126,6 @@ class MainScreen(MDScreen):
         # Aur phir finally Cards aur categories load karo
         Clock.schedule_once(self.load_initial_data, 0.1)
 
-    def apply_gradient(self):
-        container = self.ids.top_bar_container
-        
-        texture = Texture.create(size=(2, 1), colorfmt='rgba')
-        buf = bytes([26, 0, 51, 255,   75, 0, 130, 255])
-        texture.blit_buffer(buf, colorfmt='rgba', bufferfmt='ubyte')
-        
-        with container.canvas.before:
-            Color(1, 1, 1, 1) 
-            self.gradient_rect = Rectangle(pos=container.pos, size=container.size, texture=texture)
-            
-        container.bind(pos=self._update_rect, size=self._update_rect)
-
-    def _update_rect(self, instance, value):
-        if self.gradient_rect:
-            self.gradient_rect.pos = instance.pos
-            self.gradient_rect.size = instance.size
-
     def load_initial_data(self, dt):
         self.load_categories()
         self.load_cards(filter_category="All")
@@ -63,31 +133,48 @@ class MainScreen(MDScreen):
     def load_categories(self):
         self.ids.category_list.clear_widgets()
         prompts = load_prompts()
-        
+
         categories = set(item.get("category", "General") for item in prompts if item.get("category"))
-        
+        # NAYA FEATURE: har category ke saamne kitne prompts hain, wo count
+        counts = Counter(item.get("category", "General") for item in prompts)
+
+        items = []
+
         item_all = OneLineListItem(
-            text="[b]All Categories[/b]", 
+            text=f"[b]All Categories[/b]   ({len(prompts)})",
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1),
-            bg_color=(0.25, 0.25, 0.25, 1),
+            bg_color=(0.2, 0.2, 0.25, 0.6), # Glass feel (transparent)
             divider="Full",
+            radius=[12, 12, 12, 12],
+            opacity=0,
             on_release=lambda x: self.filter_and_switch("All")
         )
         item_all.ids._lbl_primary.markup = True 
         self.ids.category_list.add_widget(item_all)
+        items.append(item_all)
 
         for cat in sorted(categories):
             item = OneLineListItem(
-                text=f"[b]{cat}[/b]", 
+                text=f"[b]{cat}[/b]   ({counts[cat]})",
                 theme_text_color="Custom",
                 text_color=(1, 1, 1, 1),
-                bg_color=(0.15, 0.15, 0.15, 1),
+                bg_color=(0.1, 0.1, 0.15, 0.6), # Glass feel
                 divider="Full",
+                radius=[12, 12, 12, 12],
+                opacity=0,
                 on_release=lambda x, selected_cat=cat: self.filter_and_switch(selected_cat)
             )
             item.ids._lbl_primary.markup = True 
             self.ids.category_list.add_widget(item)
+            items.append(item)
+
+        # Cascade / staggered fade-in - ek ke baad ek smoothly reveal hote hain
+        for index, item in enumerate(items):
+            Clock.schedule_once(
+                lambda dt, it=item: Animation(opacity=1, duration=0.3, t="out_cubic").start(it),
+                index * 0.05,
+            )
 
     def open_menu_or_go_back(self):
         if self.current_filter == "All":
@@ -152,7 +239,19 @@ class MainScreen(MDScreen):
         self.load_cards(filter_category=category_name)
         self.ids.bottom_nav.switch_tab('screen_gallery')
 
-    # Professional Dialog Handlers based on CV
+    def show_random_prompt(self):
+        """
+        NAYA FEATURE: "Surprise Me" - abhi jo gallery cards load/filter
+        ho rakhe hain unme se ek random uthakar uska poora prompt dialog
+        khol deta hai. Discovery ko thoda fun/engaging banane ke liye,
+        pehle se maujood GalleryCard.show_prompt_dialog() hi reuse karta
+        hai isliye koi naya dialog-logic risk nahi hai.
+        """
+        cards = list(self.ids.gallery_grid.children)
+        if not cards:
+            return
+        random.choice(cards).show_prompt_dialog()
+
     def show_about_us(self):
         self.ids.nav_drawer.set_state("close")
         text = (
