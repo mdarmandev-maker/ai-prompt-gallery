@@ -16,19 +16,11 @@ jobs:
           python-version: '3.10'
 
       - name: 2b. Runner ki Extra Disk Space Free karna
-        # GitHub ke free runner mein sirf ~14GB free space hota hai.
-        # 2 architectures + Android NDK + saari compiled libraries
-        # isse zyada le sakti hain, jisse build beech mein
-        # "No space left on device" ke saath fail ho jaata hai
-        # (bina koi clear error message dikhaye - bas atak jaata hai).
-        # Yahan .NET, Haskell, CodeQL jaise pehle se installed lekin
-        # is build ke liye bekaar tools hata ke ~25-30GB extra space
-        # free kar rahe hain.
         run: |
           echo "Before cleanup:"
           df -h /
           sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android/sdk/ndk  # hum apna khud ka NDK use karenge (buildozer)
+          sudo rm -rf /usr/local/lib/android/sdk/ndk
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/.ghcup
           sudo rm -rf /usr/local/share/boost
@@ -47,6 +39,20 @@ jobs:
       - name: 4. Buildozer Android Build
         run: |
           yes | buildozer -v android debug
+
+      # NAYA STEP: chahe build 4 pass ho ya fail, ye step hamesha
+      # chalega (if: always()) aur batayega ki fail hone ke waqt disk
+      # space kitna bacha tha - isse hume 100% pata chal jayega ki
+      # ye disk-space issue hai ya kuch aur.
+      - name: 4b. Disk Space Check karna (Debug ke liye)
+        if: always()
+        run: |
+          echo "===== DISK SPACE (root) ====="
+          df -h /
+          echo "===== .buildozer FOLDER SIZE ====="
+          du -sh /home/runner/work/*/*/.buildozer 2>/dev/null || echo "not found"
+          echo "===== LAST 200 LINES OF BUILD LOG (agar bacha ho) ====="
+          find /home/runner -iname "*.log" -newer /home/runner/work -exec tail -n 200 {} \; 2>/dev/null || true
 
       - name: 5. APK ko Save karna
         uses: actions/upload-artifact@v4
