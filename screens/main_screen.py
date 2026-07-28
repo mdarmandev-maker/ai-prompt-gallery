@@ -7,6 +7,7 @@ from kivy.clock import Clock
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.list import OneLineListItem
+from kivymd.uix.refreshlayout import MDScrollViewRefreshLayout
 from kivy.animation import Animation  
 from kivy.properties import ListProperty, NumericProperty
 from kivy.uix.widget import Widget
@@ -234,6 +235,32 @@ class MainScreen(MDScreen):
         self.ids.gallery_grid.add_widget(gallery_card)
         
         self.current_load_index += 1
+
+    # ==========================================
+    # PULL-TO-REFRESH (Instagram jaisa swipe-down refresh)
+    # Teeno tabs (Gallery, Categories, List) ke liye alag-alag
+    # callback - user upar se neeche swipe karega to ye chalega,
+    # aur load_prompts() dobara GitHub se fresh JSON fetch karega.
+    # ==========================================
+
+    def refresh_gallery(self, *args):
+        def do_refresh(interval):
+            self.load_cards(filter_category=self.current_filter)
+            self.load_categories()
+            self.ids.refresh_layout_gallery.refresh_done()
+        Clock.schedule_once(do_refresh, 1)
+
+    def refresh_categories(self, *args):
+        def do_refresh(interval):
+            self.load_categories()
+            self.ids.refresh_layout_categories.refresh_done()
+        Clock.schedule_once(do_refresh, 1)
+
+    def refresh_list(self, *args):
+        def do_refresh(interval):
+            self.load_cards(filter_category=self.current_filter)
+            self.ids.refresh_layout_list.refresh_done()
+        Clock.schedule_once(do_refresh, 1)
 
     def filter_and_switch(self, category_name):
         self.load_cards(filter_category=category_name)
