@@ -62,8 +62,8 @@
                                 MDLabel:
                                     text: "AI Prompt Gallery"
                                     theme_text_color: "Custom"
-                                    text_color: 0, 0, 0.2, 0.5 # 50% Transparent Black (Soft Fade)
-                                    font_style: "H5"
+                                    text_color: 0, 0, 0.3, 0.5 # 50% Transparent Black (Soft Fade)
+                                    font_style: "Subtitle1"
                                     bold: True
                                     halign: "left"
                                     valign: "center"
@@ -76,7 +76,7 @@
                                     text: "AI Prompt Gallery"
                                     theme_text_color: "Custom"
                                     text_color: 1, 1, 1, 1 
-                                    font_style: "H6"
+                                    font_style: "Subtitle1"
                                     bold: True
                                     halign: "left"
                                     valign: "center"
@@ -107,7 +107,10 @@
                             text: 'Gallery'
                             icon: 'view-grid'
 
-                            ScrollView:
+                            MDScrollViewRefreshLayout:
+                                id: refresh_layout_gallery
+                                refresh_callback: root.refresh_gallery
+                                root_layout: root
                                 do_scroll_x: False
                                 MDBoxLayout:
                                     orientation: 'vertical'
@@ -129,7 +132,10 @@
                             text: 'Categories'
                             icon: 'shape'
 
-                            ScrollView:
+                            MDScrollViewRefreshLayout:
+                                id: refresh_layout_categories
+                                refresh_callback: root.refresh_categories
+                                root_layout: root
                                 do_scroll_x: False
                                 MDBoxLayout:
                                     id: category_list
@@ -144,7 +150,10 @@
                             text: 'List View'
                             icon: 'format-list-bulleted'
 
-                            ScrollView:
+                            MDScrollViewRefreshLayout:
+                                id: refresh_layout_list
+                                refresh_callback: root.refresh_list
+                                root_layout: root
                                 do_scroll_x: False
                                 MDBoxLayout:
                                     id: prompt_list
