@@ -107,6 +107,7 @@ Builder.load_string('''
             md_bg_color: 0, 0, 0, 0.45
             radius: [0, 0, 16, 16]
             padding: "10dp", "6dp"
+            spacing: "4dp"
 
             MDLabel:
                 text: root.title
@@ -118,14 +119,25 @@ Builder.load_string('''
                 shorten_from: "right"
                 valign: "bottom"
 
-        # Quick-copy - ab chhota hai + peeche ek halka glow-halo (border
-        # ke saath synced color) jo isse "premium/AI" touch deta hai
+            MDIconButton:
+                icon: "share-variant"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 0.85
+                icon_size: "16sp"
+                pos_hint: {"center_y": .45}
+                padding: 0
+                on_release: root.share_prompt()
+
+        # Quick-copy - glass-morphism look: translucent bg + colored glow
+        # halo + ek thin light border-ring (glass edge) + upar ek soft
+        # white shine (glass reflection jaisa) - premium "frosted glass"
+        # feel ke liye.
         MDBoxLayout:
             id: copy_btn_layout
             size_hint: None, None
             size: dp(30), dp(30)
             radius: [15, 15, 15, 15]
-            md_bg_color: 0, 0, 0, 0.55
+            md_bg_color: 1, 1, 1, 0.10
             pos_hint: {"right": 0.95, "top": 0.95}
             canvas.before:
                 Color:
@@ -133,6 +145,17 @@ Builder.load_string('''
                 Ellipse:
                     pos: (self.center_x - dp(20), self.center_y - dp(20))
                     size: (dp(40), dp(40))
+                Color:
+                    rgba: 1, 1, 1, 0.22
+                SmoothLine:
+                    width: 1
+                    rounded_rectangle: (self.x, self.y, self.width, self.height, 15)
+            canvas.after:
+                Color:
+                    rgba: 1, 1, 1, 0.20
+                Ellipse:
+                    pos: (self.x + self.width * 0.18, self.y + self.height * 0.52)
+                    size: (self.width * 0.5, self.height * 0.32)
 
             MDIconButton:
                 id: copy_btn_icon
@@ -144,13 +167,13 @@ Builder.load_string('''
                 padding: 0
                 on_release: root.copy_prompt()
 
-        # Favorite toggle - same treatment, chhota + synced glow-halo
+        # Favorite toggle - same glass treatment as copy button
         MDBoxLayout:
             id: heart_btn_layout
             size_hint: None, None
             size: dp(30), dp(30)
             radius: [15, 15, 15, 15]
-            md_bg_color: 0, 0, 0, 0.55
+            md_bg_color: 1, 1, 1, 0.10
             pos_hint: {"x": 0.05, "top": 0.95}
             canvas.before:
                 Color:
@@ -158,6 +181,17 @@ Builder.load_string('''
                 Ellipse:
                     pos: (self.center_x - dp(20), self.center_y - dp(20))
                     size: (dp(40), dp(40))
+                Color:
+                    rgba: 1, 1, 1, 0.22
+                SmoothLine:
+                    width: 1
+                    rounded_rectangle: (self.x, self.y, self.width, self.height, 15)
+            canvas.after:
+                Color:
+                    rgba: 1, 1, 1, 0.20
+                Ellipse:
+                    pos: (self.x + self.width * 0.18, self.y + self.height * 0.52)
+                    size: (self.width * 0.5, self.height * 0.32)
 
             MDIconButton:
                 id: heart_btn_icon
@@ -228,7 +262,6 @@ class GalleryCard(MDCard):
         super().__init__(**kwargs)
         self.dialog = None
         Clock.schedule_once(self.animate_entry, 0.1)
-        Clock.schedule_once(self._pop_in_buttons, 0.45)
         Clock.schedule_once(self._start_glow_cycle, 0)
         Clock.schedule_once(self._hook_card_image_loader, 0)
 
@@ -242,38 +275,51 @@ class GalleryCard(MDCard):
         badalta, balki visibly fade-in/fade-out bhi karta hai - jyada
         "alive"/premium AI-glow feel ke liye (Copilot/Siri jaisa pulse).
         """
+        # PERFORMANCE FIX: pehle 8 animation-steps the, ab 4 - aur duration
+        # 0.9s se badhakar 1.8s kar diya hai. Isse total animation-frame
+        # updates kaafi kam ho jaate hain (roughly half), jo bahut saare
+        # cards ek saath animate hone par CPU load kaafi kam kar deta hai,
+        # bina visual effect ko poori tarah khatam kiye.
         DIM, BRIGHT = 0.12, 0.85
         stops = [
             [0.65, 0.35, 1.0, DIM],      # violet - dim (start)
             [0.65, 0.35, 1.0, BRIGHT],   # violet - fade IN
-            [0.35, 0.55, 1.0, BRIGHT],   # -> blue, still bright
-            [0.35, 0.55, 1.0, DIM],      # blue - fade OUT
-            [1.0, 0.40, 0.70, DIM],      # -> pink, still dim
-            [1.0, 0.40, 0.70, BRIGHT],   # pink - fade IN
-            [0.65, 0.35, 1.0, BRIGHT],   # -> violet, still bright
-            [0.65, 0.35, 1.0, DIM],      # violet - fade OUT (loop point)
+            [1.0, 0.40, 0.70, BRIGHT],   # -> pink, still bright
+            [1.0, 0.40, 0.70, DIM],      # pink - fade OUT (loop point)
         ]
-        anim = Animation(glow_color=stops[1], duration=0.9, t="in_out_sine")
+        anim = Animation(glow_color=stops[1], duration=1.8, t="in_out_sine")
         for stop in stops[2:]:
-            anim += Animation(glow_color=stop, duration=0.9, t="in_out_sine")
+            anim += Animation(glow_color=stop, duration=1.8, t="in_out_sine")
         anim.repeat = True
         anim.start(self)
 
-    def _pop_in_buttons(self, *args):
+    def cleanup(self):
         """
-        Ek baar ka premium "pop" entrance - buttons 0 se apni asli size
-        tak elastic bounce ke saath aate hain. Pehle wale version mein
-        ye animation hamesha ke liye repeat hoti thi (size continuously
-        badhti-ghatti rehti thi) jo distracting lag sakta tha - ab ye
-        sirf ek baar chalta hai, phir buttons sthir (stable) rehte hain.
+        BUG FIX: har baar card list se hata di jaati thi (filter switch,
+        refresh) to iski glow animation aur spinner-pulse animation kabhi
+        cancel nahi hoti thi - background me hamesha ke liye chalti rehti
+        thi (zombie animation), jisse CPU load use karte-karte badhta
+        jaata. Ab card discard hone se theek pehle iski SAARI animations
+        (glow, entry-fade, spinner) explicitly cancel kar dete hain.
         """
-        for layout_id in ("copy_btn_layout", "heart_btn_layout"):
-            layout = self.ids.get(layout_id)
-            if not layout:
-                continue
-            target_w, target_h = layout.width, layout.height
-            layout.width, layout.height = 0, 0
-            Animation(width=target_w, height=target_h, duration=0.5, t="out_back").start(layout)
+        Animation.cancel_all(self)
+        spinner = self.ids.get("spinner_card")
+        if spinner:
+            Animation.cancel_all(spinner)
+            spinner.active = False
+
+    def pause_glow(self):
+        """
+        PERFORMANCE: jab ye card currently active tab me nahi hai (jaise
+        List View dekh rahe ho, ye Gallery ka card hai), to iska infinite
+        glow-loop pause kar dete hain. User ko dikh hi nahi raha, isliye
+        animate karte rehna sirf CPU/battery waste hai.
+        """
+        Animation.cancel_all(self, "glow_color")
+
+    def resume_glow(self):
+        """Tab wapas visible/active hone par glow-loop dobara shuru."""
+        self._start_glow_cycle()
 
     def _bounce_button(self, layout):
         """Tap par halka tactile 'press' feedback - one-shot, loop nahi."""
@@ -331,3 +377,30 @@ class GalleryCard(MDCard):
         self._bounce_button(self.ids.get("copy_btn_layout"))
         if self.dialog:
             self.dialog.dismiss()
+
+    def share_prompt(self, *args):
+        """
+        Android ka native "Share via..." sheet kholta hai (WhatsApp,
+        Instagram, etc. me directly share karne ke liye). Agar kisi
+        wajah se native share available na ho (jaise desktop pe testing
+        karte waqt), to clipboard me copy karke toast dikha deta hai -
+        taaki app kabhi crash na ho, sirf gracefully fallback ho jaye.
+        """
+        share_text = f"{self.title}\n\n{self.prompt_text}\n\nvia AI Prompt Gallery"
+        try:
+            from jnius import autoclass, cast  # type: ignore[import]
+            PythonActivity = autoclass('org.kivy.android.PythonActivity')
+            Intent = autoclass('android.content.Intent')
+            String = autoclass('java.lang.String')
+
+            intent = Intent()
+            intent.setAction(Intent.ACTION_SEND)
+            intent.setType('text/plain')
+            intent.putExtra(Intent.EXTRA_TEXT, cast('java.lang.CharSequence', String(share_text)))
+
+            current_activity = cast('android.app.Activity', PythonActivity.mActivity)
+            chooser_title = cast('java.lang.CharSequence', String('Share prompt via'))
+            current_activity.startActivity(Intent.createChooser(intent, chooser_title))
+        except Exception:
+            Clipboard.copy(share_text)
+            toast("Prompt copied - paste it anywhere to share!")
