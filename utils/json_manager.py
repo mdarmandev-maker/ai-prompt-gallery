@@ -1,12 +1,29 @@
 import json
 import requests
 import os
+import re
 import time
 from kivy.logger import Logger
 
-# Yahan 'AAPKA_GITHUB_USERNAME' ko apne asli username se badle!
-GITHUB_JSON_URL = "https://raw.githubusercontent.com/mdarmandev-maker/ai-prompt-gallery/main/data/prompts.json"
+GITHUB_JSON_URL_BASE = "https://raw.githubusercontent.com/mdarmandev-maker/ai-prompt-gallery/main/data/prompts.json"
 GITHUB_IMAGE_BASE = "https://github.com/mdarmandev-maker/Apk-imges6/"
+
+
+def _optimize_image_url(url):
+    """
+    Unsplash URLs ko chhoti size me convert karta hai (fast loading ke
+    liye). Non-Unsplash URLs (jaise tumhari apni GitHub images) ko waise
+    hi chhod deta hai, kyunki unpe ye query params kaam nahi karte.
+    """
+    if "images.unsplash.com" not in url:
+        return url
+    url = re.sub(r'([?&])w=\d+', r'\1w=500', url)
+    url = re.sub(r'([?&])q=\d+', r'\1q=65', url)
+    if "w=" not in url:
+        url += ("&" if "?" in url else "?") + "w=500"
+    if "q=" not in url:
+        url += "&q=65"
+    return url
 
 
 def load_prompts():
@@ -21,10 +38,12 @@ def load_prompts():
         response = requests.get(live_url, timeout=10)
         if response.status_code == 200:
             data = response.json()
-            # Images ko live internet link mein badalna
+            # Images ko live internet link mein badalna + size optimize karna
             for item in data:
                 if "image" in item and not item["image"].startswith("http"):
                     item["image"] = GITHUB_IMAGE_BASE + item["image"]
+                if "image" in item:
+                    item["image"] = _optimize_image_url(item["image"])
             return data
         else:
             return load_local_prompts()
