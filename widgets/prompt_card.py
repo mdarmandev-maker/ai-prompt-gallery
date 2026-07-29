@@ -111,27 +111,49 @@ class PromptCard(MDCard):
 
     def _start_glow_cycle(self, *args):
         """
-        GalleryCard jaisa hi HIGH-CONTRAST "breathing" glow loop - alpha
-        dramatically dips/rises har hue-shift ke saath. List view mein
-        thoda toned-down rakha hai (DIM/BRIGHT kam) taaki gallery cards
-        hi sabse "hero"/prominent lagein.
+        PERFORMANCE FIX: GalleryCard me pehle hi 8 steps se 4 kar diye
+        gaye the (duration 0.9s -> 1.8s) taaki bahut saare cards ek saath
+        animate hone par CPU load kam rahe - ye hi fix yahan miss ho gaya
+        tha, isliye List View ke cards Gallery se do-guna zyada animation
+        updates kar rahe the. Ab dono consistent hain. Visual "breathing"
+        glow lagbhag same rehta hai, sirf update-frequency aadhi ho gayi.
+        List view mein alpha thoda toned-down (DIM/BRIGHT kam) taaki
+        gallery cards hi sabse "hero"/prominent lagein.
         """
         DIM, BRIGHT = 0.08, 0.55
         stops = [
-            [0.65, 0.35, 1.0, DIM],
-            [0.65, 0.35, 1.0, BRIGHT],
-            [0.35, 0.55, 1.0, BRIGHT],
-            [0.35, 0.55, 1.0, DIM],
-            [1.0, 0.40, 0.70, DIM],
-            [1.0, 0.40, 0.70, BRIGHT],
-            [0.65, 0.35, 1.0, BRIGHT],
-            [0.65, 0.35, 1.0, DIM],
+            [0.65, 0.35, 1.0, DIM],      # violet - dim (start)
+            [0.65, 0.35, 1.0, BRIGHT],   # violet - fade IN
+            [1.0, 0.40, 0.70, BRIGHT],   # -> pink, still bright
+            [1.0, 0.40, 0.70, DIM],      # pink - fade OUT (loop point)
         ]
-        anim = Animation(glow_color=stops[1], duration=0.9, t="in_out_sine")
+        anim = Animation(glow_color=stops[1], duration=1.6, t="in_out_sine")
         for stop in stops[2:]:
-            anim += Animation(glow_color=stop, duration=0.9, t="in_out_sine")
+            anim += Animation(glow_color=stop, duration=1.6, t="in_out_sine")
         anim.repeat = True
         anim.start(self)
+
+    def cleanup(self):
+        """
+        BUG FIX: card list se hatne se pehle glow animation cancel karo -
+        warna background me zombie-animation ban kar hamesha chalti
+        rehti, aur CPU load progressively badhta jaata (see gallery_card.py
+        ke same fix ke liye).
+        """
+        Animation.cancel_all(self)
+
+    def pause_glow(self):
+        """
+        PERFORMANCE: jab ye card currently active tab me nahi hai (jaise
+        Gallery dekh rahe ho, ye List View ka card hai), to iska infinite
+        glow-loop pause kar dete hain - user ko dikh hi nahi raha, isliye
+        animate karte rehna sirf CPU/battery waste hai.
+        """
+        Animation.cancel_all(self, "glow_color")
+
+    def resume_glow(self):
+        """Tab wapas visible/active hone par glow-loop dobara shuru."""
+        self._start_glow_cycle()
 
     def copy_to_clipboard(self):
         Clipboard.copy(self.prompt_text)
