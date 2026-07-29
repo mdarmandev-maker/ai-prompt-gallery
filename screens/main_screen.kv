@@ -21,6 +21,18 @@
                     MDFloatLayout:
                         size_hint_y: None
                         height: "64dp" 
+
+                        # LAYER 1b: Header ke neeche ek thin glass-edge
+                        # highlight line - depth aur "floating glass panel"
+                        # feel deta hai baaki content se separate karke.
+                        # NOTE: canvas.after hamesha child widgets se PEHLE
+                        # likhna zaroori hai, warna KV parser error deta hai.
+                        canvas.after:
+                            Color:
+                                rgba: 1, 1, 1, 0.10
+                            Line:
+                                points: [self.x, self.y + 0.5, self.x + self.width, self.y + 0.5]
+                                width: 1
                         
                         # BACKGROUND LAYER
                         # LAYER 1: Sabse peeche aapki background image
@@ -62,7 +74,7 @@
                                 MDLabel:
                                     text: "AI Prompt Gallery"
                                     theme_text_color: "Custom"
-                                    text_color: 0, 0, 0.3, 0.5 # 50% Transparent Black (Soft Fade)
+                                    text_color: 0, 0, 0.2, 0.5 # 50% Transparent Black (Soft Fade)
                                     font_style: "Subtitle1"
                                     bold: True
                                     halign: "left"
@@ -93,13 +105,34 @@
                                 disabled: True
                                 on_release: root.filter_and_switch("All")
 
-                    # Footer Navigation - GLASSMORPHISM EFFECT
+                    # Footer Navigation - GLASSMORPHISM EFFECT (Enhanced)
                     MDBottomNavigation:
                         id: bottom_nav 
-                        panel_color: 0.1, 0.1, 0.12, 0.85
+                        panel_color: 0.07, 0.07, 0.1, 0.94
                         text_color_active: app.theme_cls.primary_color
-                        text_color_normal: 0.5, 0.5, 0.5, 1
+                        text_color_normal: 0.55, 0.55, 0.6, 1
                         use_text: True 
+                        canvas.before:
+                            # Premium layered glow-edge upar - plain 1px line ki
+                            # jagah 3 stacked lines (wide+soft -> thin+crisp), app
+                            # ke violet/pink accent theme se match karta glow-shadow.
+                            # Content aur nav-bar ke beech depth/separation dikhata
+                            # hai, jaisa premium "floating glass panel" jaisa lagta.
+                            Color:
+                                rgba: 0.65, 0.35, 1.0, 0.06
+                            Line:
+                                points: [self.x, self.top + dp(3), self.x + self.width, self.top + dp(3)]
+                                width: dp(2.5)
+                            Color:
+                                rgba: 1.0, 0.40, 0.70, 0.06
+                            Line:
+                                points: [self.x, self.top + dp(1.4), self.x + self.width, self.top + dp(1.4)]
+                                width: dp(1.6)
+                            Color:
+                                rgba: 1, 1, 1, 0.10
+                            Line:
+                                points: [self.x, self.top - 0.5, self.x + self.width, self.top - 0.5]
+                                width: 1
 
                         # Tab 1: Gallery (Home)
                         MDBottomNavigationItem:
